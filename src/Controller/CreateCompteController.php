@@ -80,17 +80,25 @@ class CreateCompteController extends AbstractController
                         $compte->setSolde($compte->getSolde() + $data->getDepots()->get(0)->getMontant());
                         $em->persist($compte);
                         $em->flush();
-                    } else {
+                    }
+                    else {
                         $data = ["message" => "500000 minimum pour le depot"];
 
                         return new JsonResponse($data);
                     }
 
-                } else {
+                }
+                else {
                     $data = ['message' => "Ce nom d'utilisateur existe déja !"];
                     return new JsonResponse($data);
                 }
-            } else {
+            $data = [
+                'statu' => 201,
+                'message' => "Le compte Partenaire a bien été crée"
+            ];
+            return new JsonResponse($data, 201);
+            }
+            else {
                 $compte = new Compte();
                 $compte->setNumeroCompte((uniqid()))
                     ->setSolde(0)
@@ -112,20 +120,17 @@ class CreateCompteController extends AbstractController
                     $compte->setSolde($compte->getSolde() + $data->getDepots()->get(0)->getMontant());
                     $em->persist($compte);
                     $em->flush();
-                } else {
-                    $data = ["message" => "500000 minimum pour le depot"];
+                }
+                else {
+                    $data = ["message" => "Le montant de dépot doit être au minimum 500000"];
 
                     return new JsonResponse($data);
                 }
-
-
+              $data = ['statu' => 201 , 'message' => 'Nouveau compte crée pour ce partenaire'];
+              return new JsonResponse($data , 201);
             }
 
         }
-        $data = [
-            'statu' => 201,
-            'message' => "Le compte a bien été crée"
-        ];
-        return new JsonResponse($data, 201);
+
     }
 }

@@ -55,6 +55,7 @@ class Partenaire
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="partenaire")
      * @Groups({"read", "write"})
+     *
      */
     private $user;
 
@@ -75,11 +76,12 @@ class Partenaire
      */
     private $comptes;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="partenaires")
-     * @ORM\JoinColumn(nullable=true)
-     */
-    private $utilisateur;
+//    /**
+//     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="partenaires")
+//     * @ORM\JoinColumn(nullable=true)
+//     *
+//     */
+//    private $utilisateur;
 
     public function __construct()
     {
@@ -238,15 +240,15 @@ class Partenaire
         return $this;
     }
 
-    public function getUtilisateur(): ?User
-    {
-        return $this->utilisateur;
-    }
-
-    public function setUtilisateur(?User $utilisateur): self
-    {
-        $this->utilisateur = $utilisateur;
-
-        return $this;
-    }
+//    public function getUtilisateur(): ?User
+//    {
+//        return $this->utilisateur;
+//    }
+//
+//    public function setUtilisateur(?User $utilisateur): self
+//    {
+//        $this->utilisateur = $utilisateur;
+//
+//        return $this;
+//    }
 }

@@ -3,16 +3,18 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
 
- * @ApiResource(normalizationContext={"groups"={"read"}},
- *     denormalizationContext={"groups" = {"write"}})
+ * @ApiResource(attributes={"normalizationContext"={"groups"={"read"} },
+ *     "denormalizationContext"={"groups" = {"write"}} , "enable_max_depth" = true})
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
 class User implements UserInterface
@@ -51,17 +53,19 @@ class User implements UserInterface
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Partenaire", inversedBy="user")
-     *
+     * @ORM\JoinColumn(nullable=true)
      */
     private $partenaire;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Compte", mappedBy="userCreator")
+     * @ORM\JoinColumn(nullable=true)
      */
     private $comptes;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Depot", mappedBy="userwhodid")
+     * @ORM\JoinColumn(nullable=true)
      */
     private $depots;
 
@@ -72,12 +76,11 @@ class User implements UserInterface
      */
     private $profil;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Partenaire", mappedBy="utilisateur")
-     *
-     *
-     */
-    private $partenaires;
+//    /**
+//     * @ORM\OneToMany(targetEntity="App\Entity\Partenaire", mappedBy="utilisateur")
+//     * @ORM\JoinColumn(nullable=true)
+//     */
+//    private $partenaires;
 
     public function __construct()
     {
@@ -255,34 +258,34 @@ class User implements UserInterface
         return $this;
     }
 
-    /**
-     * @return Collection|Partenaire[]
-     */
-    public function getPartenaires(): Collection
-    {
-        return $this->partenaires;
-    }
-
-    public function addPartenaire(Partenaire $partenaire): self
-    {
-        if (!$this->partenaires->contains($partenaire)) {
-            $this->partenaires[] = $partenaire;
-            $partenaire->setUtilisateur($this);
-        }
-
-        return $this;
-    }
-
-    public function removePartenaire(Partenaire $partenaire): self
-    {
-        if ($this->partenaires->contains($partenaire)) {
-            $this->partenaires->removeElement($partenaire);
-            // set the owning side to null (unless already changed)
-            if ($partenaire->getUtilisateur() === $this) {
-                $partenaire->setUtilisateur(null);
-            }
-        }
-
-        return $this;
-    }
+//    /**
+//     * @return Collection|Partenaire[]
+//     */
+//    public function getPartenaires(): Collection
+//    {
+//        return $this->partenaires;
+//    }
+//
+//    public function addPartenaire(Partenaire $partenaire): self
+//    {
+//        if (!$this->partenaires->contains($partenaire)) {
+//            $this->partenaires[] = $partenaire;
+//            $partenaire->setUtilisateur($this);
+//        }
+//
+//        return $this;
+//    }
+//
+//    public function removePartenaire(Partenaire $partenaire): self
+//    {
+//        if ($this->partenaires->contains($partenaire)) {
+//            $this->partenaires->removeElement($partenaire);
+//            // set the owning side to null (unless already changed)
+//            if ($partenaire->getUtilisateur() === $this) {
+//                $partenaire->setUtilisateur(null);
+//            }
+//        }
+//
+//        return $this;
+//    }
 }
