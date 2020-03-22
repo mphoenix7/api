@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
+
 class CreateCompteController extends AbstractController
 {
     public function __construct(UserPasswordEncoderInterface $encoder, TokenStorageInterface $token)
@@ -27,9 +28,11 @@ class CreateCompteController extends AbstractController
 
     /**
      * @Route("/api/createcompte", name="create_compte")
+     * @Is
      */
     public function createCompte(Request $request, SerializerInterface $serializer, PartenaireRepository $partenaireRepository, UserRepository $userRepository, EntityManagerInterface $em)
     {
+
         $json = $request->getContent();
         $data = $serializer->deserialize($json, Compte::class, 'json');
 
@@ -80,25 +83,22 @@ class CreateCompteController extends AbstractController
                         $compte->setSolde($compte->getSolde() + $data->getDepots()->get(0)->getMontant());
                         $em->persist($compte);
                         $em->flush();
-                    }
-                    else {
+                    } else {
                         $data = ["message" => "500000 minimum pour le depot"];
 
                         return new JsonResponse($data);
                     }
 
-                }
-                else {
+                } else {
                     $data = ['message' => "Ce nom d'utilisateur existe déja !"];
                     return new JsonResponse($data);
                 }
-            $data = [
-                'statu' => 201,
-                'message' => "Le compte Partenaire a bien été crée"
-            ];
-            return new JsonResponse($data, 201);
-            }
-            else {
+                $data = [
+                    'statu' => 201,
+                    'message' => "Le compte Partenaire a bien été crée"
+                ];
+                return new JsonResponse($data, 201);
+            } else {
                 $compte = new Compte();
                 $compte->setNumeroCompte((uniqid()))
                     ->setSolde(0)
@@ -120,14 +120,13 @@ class CreateCompteController extends AbstractController
                     $compte->setSolde($compte->getSolde() + $data->getDepots()->get(0)->getMontant());
                     $em->persist($compte);
                     $em->flush();
-                }
-                else {
+                } else {
                     $data = ["message" => "Le montant de dépot doit être au minimum 500000"];
 
                     return new JsonResponse($data);
                 }
-              $data = ['statu' => 201 , 'message' => 'Nouveau compte crée pour ce partenaire'];
-              return new JsonResponse($data , 201);
+                $data = ['statu' => 201, 'message' => 'Nouveau compte crée pour ce partenaire'];
+                return new JsonResponse($data, 201);
             }
 
         }
