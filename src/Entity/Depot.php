@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert ;
 
 
 /**
@@ -23,6 +24,8 @@ class Depot
     /**
      * @ORM\Column(type="integer")
      * @Groups({"read", "write"})
+     * @Assert\NotBlank(message="Ce champ ne doit pas être vide")
+     *
      *
      */
     private $montant;

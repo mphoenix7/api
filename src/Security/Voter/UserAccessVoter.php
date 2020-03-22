@@ -2,7 +2,7 @@
 
 namespace App\Security\Voter;
 
-use App\Entity\Compte;
+use App\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -14,7 +14,7 @@ class UserAccessVoter extends Voter
         // replace with your own logic
         // https://symfony.com/doc/current/security/voters.html
         return in_array($attribute, ['POST', 'GET'])
-            && $subject instanceof Compte;
+            && $subject instanceof User;
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
@@ -28,7 +28,18 @@ class UserAccessVoter extends Voter
         // ... (check conditions and return true to grant permission) ...
         switch ($attribute) {
             case 'POST':
-                if($user->getRoles() == 'ROLE_ADMIN_SYTEM' && $subject->getRoles() != 'ROLE_ADMIN_SYSTEM' ){
+                if($user->getRoles() ==[ 'ROLE_ADMIN_SYSTEM' ] && $subject->getProfil()->getLibelle() != 'ROLE_ADMIN_SYSTEM' ){
+                    return true;
+                }
+                if($user->getRoles() == ['ROLE_ADMIN'] && ($subject->getProfil()->getLibelle() != 'ADMIN_SYSTEM' &&
+                        $subject->getProfil()->getLibelle() != 'ADMIN')){
+                    return true;
+                }
+                if($user->getRoles() == ['ROLE_PARTENAIRE'] && $subject->getProfil()->getLibelle() == 'ADMIN_PARTENAIRE'
+                    && $subject->getProfil()->getLibelle() == 'CAISSIER_PARTENAIRE' ){
+                    return true;
+                }
+                if($user->getRoles() == ['ROLE_ADMIN_PARTENAIRE'] && $subject->getProfil()->getLibelle() == 'CAISSIER_PARTENAIRE' ){
                     return true;
                 }
                 break;

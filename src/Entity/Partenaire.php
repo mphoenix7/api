@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert ;
 
 /**
  * @ApiResource(normalizationContext={"groups"={"read"}},
@@ -25,30 +26,37 @@ class Partenaire
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"read", "write"})
+     * @Assert\NotBlank(message="Ce champ ne doit pas être vide")
      */
     private $prenom;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"read", "write"})
+     *  @Assert\NotBlank(message="Ce champ ne doit pas être vide")
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"read", "write"})
+     * @Assert\NotBlank(message="Ce champ ne doit pas être vide")
+     * @Assert\Email(message="format non condforme")
+     *
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"read", "write"})
+     * @Assert\NotBlank(message="Ce champ ne doit pas être vide")
      */
     private $adresse;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"read", "write"})
+     * @Assert\NotBlank(message="Ce champ ne doit pas être vide")
      */
     private $telephone;
 
@@ -62,12 +70,14 @@ class Partenaire
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"read", "write"})
+     * @Assert\NotBlank(message="Ce champ ne doit pas être vide")
      */
     private $ninea;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"read", "write"})
+     * @Assert\NotBlank(message="Ce champ ne doit pas être vide")
      */
     private $registreCom;
 
