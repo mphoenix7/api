@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Security\Voter;
-
 use App\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -20,6 +19,7 @@ class UserAccessVoter extends Voter
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
         $user = $token->getUser();
+      //  dd($user->getProfil()->getLibelle());
         // if the user is anonymous, do not grant access
         if (!$user instanceof UserInterface) {
             return false;
@@ -28,7 +28,7 @@ class UserAccessVoter extends Voter
         // ... (check conditions and return true to grant permission) ...
         switch ($attribute) {
             case 'POST':
-                if($user->getRoles() ==[ 'ROLE_ADMIN_SYSTEM' ] && $subject->getProfil()->getLibelle() != 'ROLE_ADMIN_SYSTEM' ){
+                if($user->getRoles() ==[ 'ROLE_ADMIN_SYSTEM' ] && $subject->getProfil()->getLibelle() != 'ADMIN_SYSTEM' ){
                     return true;
                 }
                 if($user->getRoles() == ['ROLE_ADMIN'] && ($subject->getProfil()->getLibelle() != 'ADMIN_SYSTEM' &&

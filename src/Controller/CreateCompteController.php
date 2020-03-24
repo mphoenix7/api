@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Security\Core\Security;
 
 
 class CreateCompteController extends AbstractController
@@ -31,7 +32,7 @@ class CreateCompteController extends AbstractController
      * @Route("/api/createcompte", name="create_compte")
      *
      */
-    public function createCompte(ValidatorInterface $validator , Request $request, SerializerInterface $serializer, PartenaireRepository $partenaireRepository, UserRepository $userRepository, EntityManagerInterface $em)
+    public function createCompte( Security $security, ValidatorInterface $validator , Request $request, SerializerInterface $serializer, PartenaireRepository $partenaireRepository, UserRepository $userRepository, EntityManagerInterface $em)
     {
 
         $json = $request->getContent();
@@ -39,6 +40,7 @@ class CreateCompteController extends AbstractController
 
 
         if (isset($data)) {
+            //dd($data);
             $value = $data->getPartenaire()->getNinea();
             $foundninea = $partenaireRepository->findOneBy(['ninea' => $value]);
             if (is_null($foundninea) == true) {
@@ -55,21 +57,30 @@ class CreateCompteController extends AbstractController
                     return new JsonResponse($errors , 400);
                 }
                 $em->persist($partenaire);
-                $foundusername = $userRepository->findOneBy(['username' => $data->getPartenaire()->getUser()->get(0)->getUsername()]);
 
+                $foundusername = $userRepository->findOneBy(['username' => $data->getPartenaire()->getUser()->get(0)->getUsername()]);
                 if (is_null($foundusername) == true) {
-                    $user = new User();
-                    $user->setUsername($data->getPartenaire()->getUser()->get(0)->getUsername())
-                        ->setPassword($this->encoder->encodePassword($user, $data->getPartenaire()->getUser()->get(0)->getPassword()))
-                        ->setIsActif($data->getPartenaire()->getUser()->get(0)->getIsactif())
-                        ->setRoles(['ROLE_' . $data->getPartenaire()->getUser()->get(0)->getProfil()->getLibelle()])
-                        ->setProfil($data->getPartenaire()->getUser()->get(0)->getProfil())
-                        ->setPartenaire($partenaire);
-                    $errors = $validator->validate($user);
-                    if (count($errors) > 0){
-                        return new JsonResponse($errors , 400);
+
+
+                        $user = new User();
+                        $user->setUsername($data->getPartenaire()->getUser()->get(0)->getUsername())
+                            ->setPassword($this->encoder->encodePassword($user, $data->getPartenaire()->getUser()->get(0)->getPassword()))
+                            ->setIsActif($data->getPartenaire()->getUser()->get(0)->getIsactif())
+                            ->setRoles(['ROLE_' . $data->getPartenaire()->getUser()->get(0)->getProfil()->getLibelle()])
+                            ->setProfil($data->getPartenaire()->getUser()->get(0)->getProfil());
+                    if($security->isGranted('POST', $user)) {
+                            $user->setPartenaire($partenaire);
+                        $errors = $validator->validate($user);
+                        if (count($errors) > 0) {
+                            return new JsonResponse($errors, 400);
+                        }
+                        $em->persist($user);
                     }
-                    $em->persist($user);
+                    else {
+                        $json = ['statu' => 403,
+                            'message' => "Vous ne pouvez pas effectuer cette action !"];
+                        return new JsonResponse($json, 403);
+                    }
 
 
                     $compte = new Compte();

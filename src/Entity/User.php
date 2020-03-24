@@ -8,7 +8,6 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\Validator\Constraints as Assert ;
 
 
@@ -63,7 +62,7 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="boolean")
      * @Groups({"read", "write"})
-     * @Assert\NotBlank(message="ce champ ne doit pas être null")
+     *
      */
     private $isActif;
 
@@ -91,10 +90,10 @@ class User implements UserInterface
      */
     private $profil;
 
-//    /**
-//     * @ORM\OneToMany(targetEntity="App\Entity\Partenaire", mappedBy="utilisateur")
-//     */
-//    private $partenaires;
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Partenaire", mappedBy="utilisateur")
+     */
+    private $partenaires;
 
     public function __construct()
     {
@@ -272,34 +271,33 @@ class User implements UserInterface
         return $this;
     }
 
-//    /**
-//     * @return Collection|Partenaire[]
-//     */
-//    public function getPartenaires(): Collection
-//    {
-//        return $this->partenaires;
-//    }
-//
-//    public function addPartenaire(Partenaire $partenaire): self
-//    {
-//        if (!$this->partenaires->contains($partenaire)) {
-//            $this->partenaires[] = $partenaire;
-//            $partenaire->setUtilisateur($this);
-//        }
-//
-//        return $this;
-//    }
-//
-//    public function removePartenaire(Partenaire $partenaire): self
-//    {
-//        if ($this->partenaires->contains($partenaire)) {
-//            $this->partenaires->removeElement($partenaire);
-//            // set the owning side to null (unless already changed)
-//            if ($partenaire->getUtilisateur() === $this) {
-//                $partenaire->setUtilisateur(null);
-//            }
-//        }
-//
-//        return $this;
-//    }
+  /**
+    * @return Collection|Partenaire[]
+    */
+   public function getPartenaires(): Collection
+  {
+        return $this->partenaires;
+   }
+
+   public function addPartenaire(Partenaire $partenaire): self
+    {
+        if (!$this->partenaires->contains($partenaire)) {
+            $this->partenaires[] = $partenaire;
+            $partenaire->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removePartenaire(Partenaire $partenaire): self{
+        if ($this->partenaires->contains($partenaire)) {
+            $this->partenaires->removeElement($partenaire);
+            // set the owning side to null (unless already changed)
+            if ($partenaire->getUtilisateur() === $this) {
+                $partenaire->setUtilisateur(null);
+            }
+        }
+
+        return $this;
+    }
 }
