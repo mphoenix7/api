@@ -9,8 +9,16 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ApiResource(normalizationContext={"groups"={"read"}},
- *     denormalizationContext={"groups" = {"write"}})
+ * @ApiResource(
+ * collectionOperations={
+ *     "accountcreate"={
+ *          "method"="post",
+ *          "controller"= "App\Controller\AccountCreateController",
+ *     }
+ *  },
+ *     normalizationContext={"groups"={"read"}},
+ *     denormalizationContext={"groups" = {"write"}}
+ * )
  * @ORM\Entity(repositoryClass="App\Repository\CompteRepository")
  */
 class Compte
@@ -57,9 +65,33 @@ class Compte
      */
     private $depots;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="account")
+     */
+    private $users;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="compteE")
+     */
+    private $transactionE;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="compteR")
+     */
+    private $compteR;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Affectation", mappedBy="compte")
+     */
+    private $affectations;
+
     public function __construct()
     {
         $this->depots = new ArrayCollection();
+        $this->users = new ArrayCollection();
+        $this->transactionE = new ArrayCollection();
+        $this->compteR = new ArrayCollection();
+        $this->affectations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -152,6 +184,130 @@ class Compte
             // set the owning side to null (unless already changed)
             if ($depot->getCompte() === $this) {
                 $depot->setCompte(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): self
+    {
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->setAccount($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): self
+    {
+        if ($this->users->contains($user)) {
+            $this->users->removeElement($user);
+            // set the owning side to null (unless already changed)
+            if ($user->getAccount() === $this) {
+                $user->setAccount(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Transaction[]
+     */
+    public function getTransactionE(): Collection
+    {
+        return $this->transactionE;
+    }
+
+    public function addTransactionE(Transaction $transactionE): self
+    {
+        if (!$this->transactionE->contains($transactionE)) {
+            $this->transactionE[] = $transactionE;
+            $transactionE->setCompteE($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTransactionE(Transaction $transactionE): self
+    {
+        if ($this->transactionE->contains($transactionE)) {
+            $this->transactionE->removeElement($transactionE);
+            // set the owning side to null (unless already changed)
+            if ($transactionE->getCompteE() === $this) {
+                $transactionE->setCompteE(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Transaction[]
+     */
+    public function getCompteR(): Collection
+    {
+        return $this->compteR;
+    }
+
+    public function addCompteR(Transaction $compteR): self
+    {
+        if (!$this->compteR->contains($compteR)) {
+            $this->compteR[] = $compteR;
+            $compteR->setCompteR($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCompteR(Transaction $compteR): self
+    {
+        if ($this->compteR->contains($compteR)) {
+            $this->compteR->removeElement($compteR);
+            // set the owning side to null (unless already changed)
+            if ($compteR->getCompteR() === $this) {
+                $compteR->setCompteR(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Affectation[]
+     */
+    public function getAffectations(): Collection
+    {
+        return $this->affectations;
+    }
+
+    public function addAffectation(Affectation $affectation): self
+    {
+        if (!$this->affectations->contains($affectation)) {
+            $this->affectations[] = $affectation;
+            $affectation->setCompte($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAffectation(Affectation $affectation): self
+    {
+        if ($this->affectations->contains($affectation)) {
+            $this->affectations->removeElement($affectation);
+            // set the owning side to null (unless already changed)
+            if ($affectation->getCompte() === $this) {
+                $affectation->setCompte(null);
             }
         }
 

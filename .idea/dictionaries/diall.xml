@@ -2,9 +2,15 @@
   <dictionary name="diall">
     <words>
       <w>caissier</w>
+      <w>compte</w>
+      <w>currentaffect</w>
       <w>foundusername</w>
+      <w>frais</w>
       <w>partenaire</w>
       <w>sytem</w>
+      <w>tarif</w>
+      <w>traitement</w>
+      <w>valeur</w>
     </words>
   </dictionary>
 </component>

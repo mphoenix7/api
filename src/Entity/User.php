@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert ;
  *     }
  * )
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
- * @isGranted("POST" , subject ="user")
+ *
  * 
  * 
  */
@@ -41,8 +41,10 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=180, unique=true)
      * @Groups({"read", "write"})
-     * @Assert\NotBlank(message="ce champ ne doit pas être null")
+     * @Assert\NotNull(message="ce champ ne doit pas être null")
+     *
      */
+
     private $username;
 
     /**
@@ -95,11 +97,34 @@ class User implements UserInterface
      */
     private $partenaires;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Compte", inversedBy="users")
+     */
+    private $account;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="user")
+     */
+    private $userEmetteur;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Transaction", mappedBy="userR")
+     */
+    private $userRecepteur;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Affectation", mappedBy="user")
+     */
+    private $affectations;
+
     public function __construct()
     {
         $this->comptes = new ArrayCollection();
         $this->depots = new ArrayCollection();
         $this->partenaires = new ArrayCollection();
+        $this->userEmetteur = new ArrayCollection();
+        $this->userRecepteur = new ArrayCollection();
+        $this->affectations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -170,7 +195,7 @@ class User implements UserInterface
     public function eraseCredentials()
     {
         // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+        //$this->plainPassword = null;
     }
 
     public function getIsActif(): ?bool
@@ -295,6 +320,111 @@ class User implements UserInterface
             // set the owning side to null (unless already changed)
             if ($partenaire->getUtilisateur() === $this) {
                 $partenaire->setUtilisateur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getAccount(): ?Compte
+    {
+        return $this->account;
+    }
+
+    public function setAccount(?Compte $account): self
+    {
+        $this->account = $account;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Transaction[]
+     */
+    public function getUserEmetteur(): Collection
+    {
+        return $this->userEmetteur;
+    }
+
+    public function addUserEmetteur(Transaction $userEmetteur): self
+    {
+        if (!$this->userEmetteur->contains($userEmetteur)) {
+            $this->userEmetteur[] = $userEmetteur;
+            $userEmetteur->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserEmetteur(Transaction $userEmetteur): self
+    {
+        if ($this->userEmetteur->contains($userEmetteur)) {
+            $this->userEmetteur->removeElement($userEmetteur);
+            // set the owning side to null (unless already changed)
+            if ($userEmetteur->getUser() === $this) {
+                $userEmetteur->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Transaction[]
+     */
+    public function getUserRecepteur(): Collection
+    {
+        return $this->userRecepteur;
+    }
+
+    public function addUserRecepteur(Transaction $userRecepteur): self
+    {
+        if (!$this->userRecepteur->contains($userRecepteur)) {
+            $this->userRecepteur[] = $userRecepteur;
+            $userRecepteur->setUserR($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserRecepteur(Transaction $userRecepteur): self
+    {
+        if ($this->userRecepteur->contains($userRecepteur)) {
+            $this->userRecepteur->removeElement($userRecepteur);
+            // set the owning side to null (unless already changed)
+            if ($userRecepteur->getUserR() === $this) {
+                $userRecepteur->setUserR(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Affectation[]
+     */
+    public function getAffectations(): Collection
+    {
+        return $this->affectations;
+    }
+
+    public function addAffectation(Affectation $affectation): self
+    {
+        if (!$this->affectations->contains($affectation)) {
+            $this->affectations[] = $affectation;
+            $affectation->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAffectation(Affectation $affectation): self
+    {
+        if ($this->affectations->contains($affectation)) {
+            $this->affectations->removeElement($affectation);
+            // set the owning side to null (unless already changed)
+            if ($affectation->getUser() === $this) {
+                $affectation->setUser(null);
             }
         }
 

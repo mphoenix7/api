@@ -19,7 +19,6 @@ class UserAccessVoter extends Voter
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {
         $user = $token->getUser();
-      //  dd($user->getProfil()->getLibelle());
         // if the user is anonymous, do not grant access
         if (!$user instanceof UserInterface) {
             return false;
@@ -36,7 +35,7 @@ class UserAccessVoter extends Voter
                     return true;
                 }
                 if($user->getRoles() == ['ROLE_PARTENAIRE'] && $subject->getProfil()->getLibelle() == 'ADMIN_PARTENAIRE'
-                    && $subject->getProfil()->getLibelle() == 'CAISSIER_PARTENAIRE' ){
+                    || $user->getRoles() == ['ROLE_PARTENAIRE'] && $subject->getProfil()->getLibelle() == 'CAISSIER_PARTENAIRE' ){
                     return true;
                 }
                 if($user->getRoles() == ['ROLE_ADMIN_PARTENAIRE'] && $subject->getProfil()->getLibelle() == 'CAISSIER_PARTENAIRE' ){

@@ -1,0 +1,16 @@
+if ($user->getRoles() == ['ROLE_CAISSIER_PARTENAIRE']){
+            $date = strtotime(Date('d-m-Y'));
+            $currentaffect = $user->getAffectations();
+            //dd($currentaffect);
+            foreach ($currentaffect as $affect){
+                if(strtotime($affect->getDateFin()->format('d-m-Y')) < $date){
+                    $affect->setEtat(false);
+                    $this->em->flush();
+
+
+                }
+                elseif ($date >= strtotime($affect->getDateDebut()->format('d-m-Y')) && $date < $affect->getDateFin()->format('d-m-Y')){
+                    $affect->setEtat(1);
+                }
+            }
+        }

@@ -4,9 +4,20 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
+use App\Controller\TransactionController;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert ;
 
 /**
- * @ApiResource()
+ * @ApiResource(collectionOperations={
+ *     "transaction"={
+ *          "method"="post",
+ *          "controller"= TransactionController::class
+ *     }
+ *  },
+ *  normalizationContext={"groups"={"read"}},
+ *          denormalizationContext={"groups" = {"write"}}
+ *     )
  * @ORM\Entity(repositoryClass="App\Repository\TransactionRepository")
  */
 class Transaction
@@ -19,12 +30,15 @@ class Transaction
     private $id;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string" , length=255)
+     * @Groups({"read" ,"write"})
      */
     private $code;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"read", "write"})
+     * @Assert\NotNull(message="Ce champs est obligatoire")
      */
     private $montant;
 
@@ -35,16 +49,23 @@ class Transaction
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"read", "write"})
+     * @Assert\NotNull(message="Ce champs est obligatoire")
+     *
      */
     private $emetteur;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"read", "write"})
+     * @Assert\NotNull(message="Ce champs est obligatoire")
      */
     private $typePieceEmetteur;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"read", "write"})
+     * @Assert\NotNull(message="Ce champs est obligatoire")
      */
     private $numeroPieceEmetteur;
 
@@ -55,6 +76,8 @@ class Transaction
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"read", "write"})
+     * @Assert\NotNull(message="Ce champs est obligatoire")
      */
     private $telephoneEmetteur;
 
@@ -64,32 +87,40 @@ class Transaction
     private $commissionEmetteur;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime" , nullable=true)
+     * @Groups({"read", "write"})
      */
     private $dateRetrait;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255 , )
+     * @Groups({"read", "write"})
      */
     private $Recepteur;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255 , nullable=true)
+     * @Groups({"read", "write"})
+     *
      */
     private $typePieceRecepteur;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"read", "write"})
+     * @Assert\NotNull(message="Ce champs est obligatoire")
      */
     private $telephoneRecepteur;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"read", "write"})
      */
     private $numeroPieceRecepteur;
 
     /**
-     * @ORM\Column(type="float")
+     * @ORM\Column(type="float" )
+     *
      */
     private $commissionRecepteur;
 
@@ -108,17 +139,49 @@ class Transaction
      */
     private $statu;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="userEmetteur")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $userD;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="userRecepteur")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $userR;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Compte", inversedBy="transactionE")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $compteD;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Compte", inversedBy="compteR")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $compteR;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Tarif", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $tarif;
+
+
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getCode(): ?int
+    public function getCode(): ?string
     {
         return $this->code;
     }
 
-    public function setCode(int $code): self
+    public function setCode(string $code): self
     {
         $this->code = $code;
 
@@ -328,4 +391,66 @@ class Transaction
 
         return $this;
     }
+
+    public function getUserD(): ?User
+    {
+        return $this->userD;
+    }
+
+    public function setUserD(?User $userD): self
+    {
+        $this->userD = $userD;
+
+        return $this;
+    }
+
+    public function getUserR(): ?User
+    {
+        return $this->userR;
+    }
+
+    public function setUserR(?User $userR): self
+    {
+        $this->userR = $userR;
+
+        return $this;
+    }
+
+    public function getCompteD(): ?Compte
+    {
+        return $this->compteD;
+    }
+
+    public function setCompteD(?Compte $compteD): self
+    {
+        $this->compteD = $compteD;
+
+        return $this;
+    }
+
+    public function getCompteR(): ?Compte
+    {
+        return $this->compteR;
+    }
+
+    public function setCompteR(?Compte $compteR): self
+    {
+        $this->compteR = $compteR;
+
+        return $this;
+    }
+
+    public function getTarif(): ?Tarif
+    {
+        return $this->tarif;
+    }
+
+//    public function setTarif(Tarif $tarif): self
+//    {
+//        $this->tarif = $tarif;
+//
+//        return $this;
+//    }
+
+
 }

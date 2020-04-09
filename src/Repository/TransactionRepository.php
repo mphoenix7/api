@@ -23,7 +23,7 @@ class TransactionRepository extends ServiceEntityRepository
     //  * @return Transaction[] Returns an array of Transaction objects
     //  */
     /*
-    public function findByExampleField($value)
+    public function findByCode($code)
     {
         return $this->createQueryBuilder('t')
             ->andWhere('t.exampleField = :val')
@@ -36,15 +36,15 @@ class TransactionRepository extends ServiceEntityRepository
     }
     */
 
-    /*
-    public function findOneBySomeField($value): ?Transaction
+
+    public function findOneByCode($code): ?Transaction
     {
         return $this->createQueryBuilder('t')
-            ->andWhere('t.exampleField = :val')
-            ->setParameter('val', $value)
+            ->andWhere('t.code = :val')
+            ->setParameter('val', $code)
             ->getQuery()
             ->getOneOrNullResult()
         ;
     }
-    */
+
 }

@@ -22,6 +22,7 @@ use Symfony\Component\Security\Core\Security;
 
 class CreateCompteController extends AbstractController
 {
+    private $encoder , $token , $security;
     public function __construct(UserPasswordEncoderInterface $encoder, TokenStorageInterface $token)
     {
         $this->encoder = $encoder;
@@ -32,7 +33,7 @@ class CreateCompteController extends AbstractController
      * @Route("/api/createcompte", name="create_compte")
      *
      */
-    public function createCompte( Security $security, ValidatorInterface $validator , Request $request, SerializerInterface $serializer, PartenaireRepository $partenaireRepository, UserRepository $userRepository, EntityManagerInterface $em)
+    public function createCompte(Security $security, ValidatorInterface $validator, Request $request, SerializerInterface $serializer, PartenaireRepository $partenaireRepository, UserRepository $userRepository, EntityManagerInterface $em)
     {
 
         $json = $request->getContent();
@@ -53,8 +54,8 @@ class CreateCompteController extends AbstractController
                     ->setNinea($data->getPartenaire()->getNinea())
                     ->setRegistreCom($data->getPartenaire()->getRegistreCom());
                 $errors = $validator->validate($partenaire);
-                if (count($errors) > 0){
-                    return new JsonResponse($errors , 400);
+                if (count($errors) > 0) {
+                    return new JsonResponse($errors, 400);
                 }
                 $em->persist($partenaire);
 
@@ -62,21 +63,20 @@ class CreateCompteController extends AbstractController
                 if (is_null($foundusername) == true) {
 
 
-                        $user = new User();
-                        $user->setUsername($data->getPartenaire()->getUser()->get(0)->getUsername())
-                            ->setPassword($this->encoder->encodePassword($user, $data->getPartenaire()->getUser()->get(0)->getPassword()))
-                            ->setIsActif($data->getPartenaire()->getUser()->get(0)->getIsactif())
-                            ->setRoles(['ROLE_' . $data->getPartenaire()->getUser()->get(0)->getProfil()->getLibelle()])
-                            ->setProfil($data->getPartenaire()->getUser()->get(0)->getProfil());
-                    if($security->isGranted('POST', $user)) {
-                            $user->setPartenaire($partenaire);
+                    $user = new User();
+                    $user->setUsername($data->getPartenaire()->getUser()->get(0)->getUsername())
+                        ->setPassword($this->encoder->encodePassword($user, $data->getPartenaire()->getUser()->get(0)->getPassword()))
+                        ->setIsActif($data->getPartenaire()->getUser()->get(0)->getIsactif())
+                        ->setRoles(['ROLE_' . $data->getPartenaire()->getUser()->get(0)->getProfil()->getLibelle()])
+                        ->setProfil($data->getPartenaire()->getUser()->get(0)->getProfil());
+                    if ($security->isGranted('POST', $user)) {
+                        $user->setPartenaire($partenaire);
                         $errors = $validator->validate($user);
                         if (count($errors) > 0) {
                             return new JsonResponse($errors, 400);
                         }
                         $em->persist($user);
-                    }
-                    else {
+                    } else {
                         $json = ['statu' => 403,
                             'message' => "Vous ne pouvez pas effectuer cette action !"];
                         return new JsonResponse($json, 403);
@@ -90,8 +90,8 @@ class CreateCompteController extends AbstractController
                         ->setUserCreator($this->token->getToken()->getUser())
                         ->setPartenaire($partenaire);
                     $errors = $validator->validate($compte);
-                    if (count($errors) > 0){
-                        return new JsonResponse($errors , 400);
+                    if (count($errors) > 0) {
+                        return new JsonResponse($errors, 400);
                     }
                     $em->persist($compte);
 
@@ -103,8 +103,8 @@ class CreateCompteController extends AbstractController
                             ->setUserwhodid($this->token->getToken()->getUser())
                             ->setCompte($compte);
                         $errors = $validator->validate($depot);
-                        if (count($errors) > 0){
-                            return new JsonResponse($errors , 400);
+                        if (count($errors) > 0) {
+                            return new JsonResponse($errors, 400);
                         }
                         $em->persist($depot);
 
@@ -112,9 +112,9 @@ class CreateCompteController extends AbstractController
                         $em->persist($compte);
                         $em->flush();
                     } else {
-                        $data = ["message" => "500000 minimum pour le depot"];
+                        $data = ["message" => "Le montant du dépot doit être au minimum 500 000 FCFA"];
 
-                        return new JsonResponse($data);
+                        return new JsonResponse($data,403);
                     }
 
                 } else {
