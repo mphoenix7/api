@@ -45,6 +45,10 @@ class RetraitController extends AbstractController
 
 
                     }
+                    if (!isset($compte)) {
+                        $json = ["message" => "Aucune affectation encours veuillez contacter votre Administrateur"];
+                        return new JsonResponse($json, 404);
+                    }
 
                     if ($compte->getSolde() - $check_transaction->getMontant() > 0 || $compte->getsolde() > $check_transaction->getMontant()) {
                         $check_transaction->setDateRetrait($test)
@@ -63,28 +67,25 @@ class RetraitController extends AbstractController
                         return new JsonResponse("Votre solde est insuffisant. Solde: " . $compte->getSolde());
                     }
                 } else {
-                        if ($compte->getSolde() - $check_transaction->getMontant() > 0 || $compte->getsolde() > $check_transaction->getMontant()) {
-                            $check_transaction->setDateRetrait($test)
-                                ->setCompteR($compte)
-                                ->setRecepteur($check_transaction->getRecepteur())
-                                ->setCompteR($data->getCompteR())
-                                ->setUserR($user)
-                                ->setTypePieceRecepteur($data->getTypePieceRecepteur())
-                                ->setNumeroPieceRecepteur($data->getNumeroPieceRecepteur());
+                    if ($data->getCompte()->getSolde() - $check_transaction->getMontant() > 0 || $data->getCompte()->getsolde() > $check_transaction->getMontant()) {
+                        $check_transaction->setDateRetrait($test)
+                            ->setRecepteur($check_transaction->getRecepteur())
+                            ->setUserR($user)
+                            ->setTypePieceRecepteur($data->getTypePieceRecepteur())
+                            ->setNumeroPieceRecepteur($data->getNumeroPieceRecepteur());
 
-                            $check_transaction->getCompteD()->setSolde($check_transaction->getCompteD()->getSolde() + $check_transaction->getMontant());
-                            $check_transaction->getCompteR()->setSolde($check_transaction->getCompteR()->getSolde() - $check_transaction->getMontant());
-                            $check_transaction->setStatu(false);
-                            $manager->persist($check_transaction);
-                            $manager->flush();
-                        } else {
-                            return new JsonResponse("Votre solde est insuffisant. Solde: " . $compte->getSolde());
-                        }
+                        $check_transaction->getCompteR()->setSolde($check_transaction->getCompteR()->getSolde() - $check_transaction->getMontant());
+                        $check_transaction->setStatu(false);
+                        $manager->persist($check_transaction);
+                        $manager->flush();
+                    } else {
+                        return new JsonResponse("Votre solde est insuffisant. Solde: " .$data->getCompte()->getSolde());
+                    }
 
                 }
-            }else{
+            } else {
                 $json = ["message" => "Ce code n'existe pas dans la base ou la somme à déja été retiré"];
-                return new JsonResponse($json , 404);
+                return new JsonResponse($json, 404);
 
             }
 
@@ -95,7 +96,7 @@ class RetraitController extends AbstractController
         }
 
 
-        return new JsonResponse("Opération réussie ! " , 200);
+        return new JsonResponse("Opération réussie ! ", 200);
 
 
     }
